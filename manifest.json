@@ -9,9 +9,9 @@
     "browser_action": {
         "default_popup": "index.html"
     },
-    "background": {
-        "page": "background.html"
-    },
+    "permissions": [
+        "tabs"
+    ],
     "content_scripts": [
         {
             "matches": [
