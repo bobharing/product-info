@@ -28,6 +28,7 @@ The following sites are supported:
     * Startmoments
 * Prettier detail list
 * Cached vs Uncached (Currently shows results from content endpoint not the response cached data)
+* CatID courses support
 
 ## Help
 If you would like to help with the project please feel free to do a clone and create a PR with your changes!
