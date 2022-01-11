@@ -1,61 +1,140 @@
-const pageEl = document.querySelector("#js-page-url")
-const button = document.querySelector("#js-button")
+const pageEl = document.querySelector("#js-page-url");
+const button = document.querySelector("#js-button");
 
-chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0]
+chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+	const activeTab = tabs[0];
 
-    getProductInfoView(activeTab?.url)
+	initProductView(activeTab?.url);
 
-    button.addEventListener("click", () => {
-        pageEl.innerText = ""
-        // TODO here until we know for sure this approach can be removed, see the /content/index.js TODO note
-        // chrome.tabs.sendMessage(tabs[0].id, {
-        //     message: "GetDetails"
-        // })
-        getProductInfoView(activeTab?.url)
-    })
-})
+	button.addEventListener("click", () => {
+		pageEl.innerText = "";
+		// TODO here until we know for sure this approach can be removed, see the /content/index.js TODO note
+		// chrome.tabs.sendMessage(tabs[0].id, {
+		//     message: "GetDetails"
+		// })
+		initProductView(activeTab?.url);
+	});
+});
 
-const getProductInfoView = url => {
-    const requestUrlObject = createRequestUrl(url)
+// Create product detail view
 
-    requestContent(requestUrlObject.baseUrl+requestUrlObject.endpoint+requestUrlObject.query).then(data => {
-        console.log(data.page)
-        pageEl.appendChild(createListElement(data.page))
-    })
-}
+const initProductView = async url => {
+	const requestUrl = createRequestUrl(url);
 
-const createListElement = (page) => {
-    const listEl = document.createElement("ul")
-    
-    for (const property in page) {
-        const listItemEl = document.createElement("li")
-        listItemEl.innerText = `${property}_____${page[property]}`
-        listEl.appendChild(listItemEl)
-    }
+	const responseData = await requestContent(requestUrl);
 
-    return listEl
-}
+	// Insert content to div
+	const list = createListElement(responseData.page);
+	pageEl.appendChild(list);
+};
 
-const requestContent = async (url) => {
-    try {
-        const response = await fetch(url)
-        return await response.json()
-    } catch (error) {
-        console.error("Product Info Extension", error)
-    }
-}
+const createListElement = product => {
+	const tableEl = document.createElement("table");
+
+	product = sortProductDetails(product);
+
+	// Create the table elements
+	const objectKeys = Object.keys(product);
+	for (let counter = 0; counter <= objectKeys.length - 1; counter++) {
+		const propKey = objectKeys[counter];
+
+		let rowEl, cellKey, cellValue;
+		rowEl = tableEl.insertRow(counter);
+
+		// Insert Category row
+		if (isCategoryTitle(propKey)) {
+			const headerCell = document.createElement("th");
+			headerCell.innerText = product[propKey];
+
+			rowEl.appendChild(headerCell);
+
+			continue;
+		}
+
+		// Insert cells
+		cellKey = rowEl.insertCell(0);
+		cellKey.innerText = propKey;
+		cellKey.classList.add("c-cell-key");
+
+		cellValue = rowEl.insertCell(1);
+		cellValue.innerText = product[propKey];
+		cellValue.classList.add("c-cell-value");
+
+		// Add copy detail value
+		cellValue.addEventListener("click", () => {
+			navigator.clipboard.writeText(product[propKey]);
+
+			cellValue.classList.add("js-copied");
+
+			setTimeout(() => cellValue.classList.remove("js-copied"), 1000);
+		});
+	}
+
+	return tableEl;
+};
+
+const isCategoryTitle = key => {
+	return key.startsWith("__");
+};
+
+const insertRow = tableEl => {
+	let rowEl, cellKey, cellValue;
+	rowEl = tableEl.insertRow(counter);
+
+	cellKey = rowEl.insertCell(0);
+	cellKey.innerText = objectKeys[counter];
+
+	cellValue = rowEl.insertCell(1);
+	cellValue.innerText = product[objectKeys[counter]];
+};
+
+const sortProductDetails = product => {
+	console.log(product);
+	const propertyPrio = [
+		"courseTemplateID",
+		"olympusCourseID",
+		"nodeGUID",
+		"courseType",
+		"productType",
+		"shouldCache",
+		"documentCulture",
+		"documentLanguage",
+		"priceWithVAT",
+		"priceWithoutVAT",
+		"courseSource",
+		"schemaData",
+	];
+
+	const productWithOrderedProps = {};
+
+	// Set the prio's first
+	propertyPrio.forEach(prop => {
+		productWithOrderedProps[prop] = product[prop];
+	});
+
+	const restSeperator = { __categoryTitle: "Other properties" };
+
+	// Merge the objects
+	return { ...productWithOrderedProps, ...restSeperator, ...product };
+};
+
+// Request related
+
+const requestContent = async url => {
+	try {
+		const response = await fetch(url);
+		return await response.json();
+	} catch (error) {
+		console.error("Product Info Extension", error);
+	}
+};
 
 const createRequestUrl = url => {
-    const pageUrl = url
-    const parser = document.createElement("a")
-    parser.href = pageUrl
+	const pageUrl = url;
+	const parser = document.createElement("a");
+	parser.href = pageUrl;
 
-    const pagePath = encodeURIComponent(parser.pathname)
+	const pagePath = encodeURIComponent(parser.pathname);
 
-    return {
-        endpoint: "/content",
-        query: `?url=${pagePath}`,
-        baseUrl: parser.origin
-    }
-}
+	return `${parser.origin}/content?url=${pagePath}`;
+};

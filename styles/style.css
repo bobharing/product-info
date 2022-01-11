@@ -1,0 +1,12 @@
+.c-cell-value {
+	transition: 0.3s;
+}
+
+.c-cell-value.js-copied::after {
+	content: " - Copied";
+}
+
+.c-cell-value:hover {
+	cursor: pointer;
+	background-color: cadetblue;
+}
