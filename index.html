@@ -1,16 +1,17 @@
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Details of you product</title>
-    <link rel="stylesheet" href="/styles/style.css" />
-  </head>
-  <body class="c-body">
-    <h1>Product details</h1>
-    <div class="c-main-container">
-      <button id="js-button">Refresh</button>
-      <div id="js-page-url" class="c-details">
-      </div>
-    </div>
-    <script type="module" src="/js/index.js"></script>
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Details of you product</title>
+		<link rel="stylesheet" href="/styles/style.css" />
+	</head>
+	<body class="c-body">
+		<h1 class="c-title">Product details</h1>
+		<button id="js-refresh-button" class="c-refresh-button">
+			<img class="c-refresh-button__icon" alt="refresh product info" src="/icons/refresh-page-option.png" />
+		</button>
+		<div class="c-main-container">
+			<div id="js-page-url" class="c-details"></div>
+		</div>
+		<script type="module" src="/js/index.js"></script>
+	</body>
 </html>

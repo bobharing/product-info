@@ -1,3 +1,22 @@
+.c-body {
+	min-width: 450px;
+	padding: 10px;
+}
+
+.c-title {
+	display: inline-block;
+}
+
+.c-refresh-button {
+	border: none;
+	background-color: transparent;
+}
+
+.c-refresh-button__icon {
+	width: 15px;
+	cursor: pointer;
+}
+
 .c-cell-value {
 	transition: 0.3s;
 }
@@ -11,6 +30,20 @@
 	background-color: cadetblue;
 }
 
-.c-category-title {
-	text-align: left;
+.c-category-row {
+	cursor: pointer;
+	transition: 0.3s;
+	background-color: #89cff0;
+}
+
+.c-category-row:hover {
+	background-color: #2cace7;
+}
+
+.c-category-row--closed ~ tr {
+	display: none;
+}
+
+.c-category-row__title {
+	padding: 10px;
 }

@@ -1,5 +1,5 @@
 const pageEl = document.querySelector("#js-page-url");
-const button = document.querySelector("#js-button");
+const button = document.querySelector("#js-refresh-button");
 
 chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 	const activeTab = tabs[0];
@@ -9,11 +9,15 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 	button.addEventListener("click", () => {
 		pageEl.innerText = "";
 		// TODO here until we know for sure this approach can be removed, see the /content/index.js TODO note
-		chrome.tabs.sendMessage(tabs[0].id, {
-		    message: "GetPageData"
-		}, response => {
-			console.log(response.message)
-		})
+		chrome.tabs.sendMessage(
+			tabs[0].id,
+			{
+				message: "GetPageData",
+			},
+			response => {
+				console.log(response.message);
+			},
+		);
 
 		initProductView(activeTab?.url);
 	});
@@ -26,7 +30,7 @@ const initProductView = async url => {
 	const responseData = await requestContent(contentRequestUrl);
 
 	if (responseData === null) {
-		return
+		return;
 	}
 
 	// Insert content to div
@@ -51,9 +55,14 @@ const createListElement = product => {
 		if (isCategoryTitle(propKey)) {
 			const headerCell = document.createElement("th");
 			headerCell.innerText = product[propKey];
-			headerCell.classList.add("c-category-title")
-
+			headerCell.classList.add("c-category-row__title");
+			headerCell.setAttribute("colspan", "2");
 			rowEl.appendChild(headerCell);
+
+			rowEl.classList.add("c-category-row", "c-category-row--closed");
+			rowEl.addEventListener("click", event => {
+				event.currentTarget.classList.toggle("c-category-row--closed");
+			});
 
 			continue;
 		}
@@ -108,7 +117,6 @@ const sortProductDetails = product => {
 		"priceWithVAT",
 		"priceWithoutVAT",
 		"courseSource",
-		"schemaData",
 	];
 
 	const productWithOrderedProps = {};
@@ -129,15 +137,15 @@ const sortProductDetails = product => {
 const requestContent = async url => {
 	try {
 		const response = await fetch(url);
-		
+
 		if (response.status !== 200) {
-			return null
+			return null;
 		}
 
 		return await response.json();
 	} catch (error) {
 		console.error("Product Info Extension", error);
-		return null
+		return null;
 	}
 };
 
