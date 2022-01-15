@@ -10,3 +10,7 @@
 	cursor: pointer;
 	background-color: cadetblue;
 }
+
+.c-category-title {
+	text-align: left;
+}

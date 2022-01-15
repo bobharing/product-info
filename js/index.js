@@ -9,9 +9,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 	button.addEventListener("click", () => {
 		pageEl.innerText = "";
 		// TODO here until we know for sure this approach can be removed, see the /content/index.js TODO note
-		// chrome.tabs.sendMessage(tabs[0].id, {
-		//     message: "GetDetails"
-		// })
+		chrome.tabs.sendMessage(tabs[0].id, {
+		    message: "GetPageData"
+		}, response => {
+			console.log(response.message)
+		})
+
 		initProductView(activeTab?.url);
 	});
 });
@@ -19,9 +22,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 // Create product detail view
 
 const initProductView = async url => {
-	const requestUrl = createRequestUrl(url);
+	const contentRequestUrl = createContentRequestUrl(url);
+	const responseData = await requestContent(contentRequestUrl);
 
-	const responseData = await requestContent(requestUrl);
+	if (responseData === null) {
+		return
+	}
 
 	// Insert content to div
 	const list = createListElement(responseData.page);
@@ -45,6 +51,7 @@ const createListElement = product => {
 		if (isCategoryTitle(propKey)) {
 			const headerCell = document.createElement("th");
 			headerCell.innerText = product[propKey];
+			headerCell.classList.add("c-category-title")
 
 			rowEl.appendChild(headerCell);
 
@@ -89,7 +96,6 @@ const insertRow = tableEl => {
 };
 
 const sortProductDetails = product => {
-	console.log(product);
 	const propertyPrio = [
 		"courseTemplateID",
 		"olympusCourseID",
@@ -123,13 +129,19 @@ const sortProductDetails = product => {
 const requestContent = async url => {
 	try {
 		const response = await fetch(url);
+		
+		if (response.status !== 200) {
+			return null
+		}
+
 		return await response.json();
 	} catch (error) {
 		console.error("Product Info Extension", error);
+		return null
 	}
 };
 
-const createRequestUrl = url => {
+const createContentRequestUrl = url => {
 	const pageUrl = url;
 	const parser = document.createElement("a");
 	parser.href = pageUrl;
