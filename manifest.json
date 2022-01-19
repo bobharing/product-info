@@ -1,12 +1,12 @@
 {
     "name": "NP2 - Product Details",
     "version": "0.1",
-    "manifest_version": 2,
-    "description": "View details of a product",
+    "manifest_version": 3,
+    "description": "View details of a product for the NP2 platform",
     "icons": {
         "128": "icons/product128x128.png"
     },
-    "browser_action": {
+    "action": {
         "default_popup": "index.html"
     },
     "permissions": [
