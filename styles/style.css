@@ -9,8 +9,12 @@
 }
 
 .c-refresh-button {
-	border: none;
-	background-color: transparent;
+	padding: 10px;
+	float: right;
+}
+
+.c-refresh-button:hover {
+	cursor: pointer;
 }
 
 .c-refresh-button__icon {
@@ -47,4 +51,14 @@
 
 .c-category-row__title {
 	padding: 10px;
+}
+
+.c-loader--open {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url("/icons/Infinity-1s-200px.gif") 50% 50% no-repeat rgb(249, 249, 249);
 }

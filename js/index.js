@@ -1,35 +1,51 @@
+import { customLog, customError } from "./extensionLogging.js";
+
+console.log = customLog("Product Info Extension:");
+console.error = customError("Product Info Extension:");
+
 const pageEl = document.querySelector("#js-page-url");
 const button = document.querySelector("#js-refresh-button");
 
 chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
 	const activeTab = tabs[0];
-
-	initProductView(activeTab?.url);
+	chrome.tabs.sendMessage(
+		tabs[0].id,
+		{
+			message: "GetPageData",
+		},
+		response => {
+			initProductView({ page: response.message });
+		},
+	);
 
 	button.addEventListener("click", () => {
 		pageEl.innerText = "";
-		// TODO here until we know for sure this approach can be removed, see the /content/index.js TODO note
-		chrome.tabs.sendMessage(
-			tabs[0].id,
-			{
-				message: "GetPageData",
-			},
-			response => {
-				console.log(response.message);
-			},
-		);
 
-		initProductView(activeTab?.url);
+		const loaderEl = document.querySelector("#js-loader");
+
+		loaderEl.classList.add("c-loader--open");
+
+		initProductView({ url: activeTab?.url }).then(() => {
+			loaderEl.classList.remove("c-loader--open");
+		});
 	});
 });
 
 // Create product detail view
 
-const initProductView = async url => {
-	const contentRequestUrl = createContentRequestUrl(url);
-	const responseData = await requestContent(contentRequestUrl);
+const initProductView = async initConfig => {
+	let responseData;
 
-	if (responseData === null) {
+	if (!!initConfig?.url) {
+		console.log("Getting from new request");
+		const contentRequestUrl = createContentRequestUrl(initConfig.url);
+		responseData = await requestContent(contentRequestUrl);
+	} else if (!!initConfig?.page) {
+		console.log("Getting from cache");
+		responseData = initConfig.page;
+	}
+
+	if (responseData === null || responseData === undefined) {
 		return;
 	}
 
@@ -57,8 +73,8 @@ const createListElement = product => {
 			headerCell.innerText = product[propKey];
 			headerCell.classList.add("c-category-row__title");
 			headerCell.setAttribute("colspan", "2");
-			rowEl.appendChild(headerCell);
 
+			rowEl.appendChild(headerCell);
 			rowEl.classList.add("c-category-row", "c-category-row--closed");
 			rowEl.addEventListener("click", event => {
 				event.currentTarget.classList.toggle("c-category-row--closed");
@@ -136,7 +152,11 @@ const sortProductDetails = product => {
 
 const requestContent = async url => {
 	try {
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			headers: {
+				"Cache-Control": "no-cache",
+			},
+		});
 
 		if (response.status !== 200) {
 			return null;
@@ -156,5 +176,5 @@ const createContentRequestUrl = url => {
 
 	const pagePath = encodeURIComponent(parser.pathname);
 
-	return `${parser.origin}/content?url=${pagePath}`;
+	return `${parser.origin}/content?url=${pagePath}%3F__preview-token`;
 };

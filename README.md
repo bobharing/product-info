@@ -28,7 +28,6 @@ The following sites are supported:
 ## Upcoming features
 
 -   Add the startmoment information of the first upcoming startmoment
--   Cached vs Uncached (Currently shows results from content endpoint not the response cached data)
 -   Pretty product values
 -   Async features support
     -   Review
