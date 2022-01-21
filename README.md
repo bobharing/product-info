@@ -27,6 +27,7 @@ The following sites are supported:
 
 ## Upcoming features
 
+-   Add support (toggle) for develop environment
 -   Add the startmoment information of the first upcoming startmoment
 -   Pretty product values
 -   Async features support
@@ -35,6 +36,7 @@ The following sites are supported:
     -   Startmoments
 -   CatID courses support
 -   Sort product details in categories
+-   Make the design hot
 
 ## Help
 
