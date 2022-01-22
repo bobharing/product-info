@@ -20,7 +20,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			for (const scriptEl of scriptElements) {
 				const match = scriptEl.innerHTML.match("window.__INITIAL_STATE__=(.*)");
 				if (match !== null) {
-					initStateScript = match[1].match(matchEndScript)[1];
+					const scriptWith = match[1].match(matchEndScript);
+
+					// On non-dev builds __INITIAL_STATE__ contains js affixed
+					initStateScript = scriptWith !== null ? scriptWith[1] : match[1];
 				}
 			}
 
