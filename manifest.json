@@ -1,23 +1,19 @@
 {
-    "name": "NP2 - Product Details",
-    "version": "0.1",
-    "manifest_version": 3,
-    "description": "View details of a product for the NP2 platform",
-    "icons": {
-        "128": "icons/product128x128.png"
-    },
-    "action": {
-        "default_popup": "index.html"
-    },
-    "permissions": [
-        "tabs"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": ["js/content/index.js"]
-        }
-    ]
+	"name": "NP2 - Product Details",
+	"version": "0.1.1",
+	"manifest_version": 3,
+	"description": "View details of a product for the NP2 platform",
+	"icons": {
+		"128": "icons/product128x128.png"
+	},
+	"action": {
+		"default_popup": "index.html"
+	},
+	"permissions": ["tabs"],
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["js/content/index.js"]
+		}
+	]
 }
